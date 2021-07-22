@@ -106,7 +106,7 @@ func filterDataLine(sessionId string, params []string) {
 			for k := range data[sessionId] {
 				produceOutput("filter-dataline", sessionId, token, data[sessionId][k])
 			}
-			data[sessionId] = nil
+			delete(data, sessionId)
 	}
 }
 
