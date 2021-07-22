@@ -20,6 +20,7 @@ import (
 	"bufio"
 	"flag"
 	"fmt"
+	"errors"
 	"log"
 	"os"
 	"strings"
@@ -72,15 +73,17 @@ func filterDataLine(sessionId string, params []string) {
 		if header.Get("Reply-To") == "" {
 			e, err := mail.ParseAddress(header.Get("To"))
 			if err != nil {
-				log.Fatal(err)
+				println("Error while parsing 'To:' header: " + err);
+				goto End
 			}
 			if re.MatchString(e.Address) {
 				e, err = mail.ParseAddress(header.Get("From"))
 				if err != nil {
-					log.Fatal(err)
+					println("Error while parsing 'From:' header: " + err);
+					goto End
 				}
 				parts := strings.Split(e.Address, "@")
-				var replyTo string
+				replyTo := parts[0] + "_" + parts[1] + "@hmail.app"
 				if e.Name != "" {
 					replyTo = e.Name + " <" + parts[0] + "_" + parts[1] + "@hmail.app>"
 				} else {
@@ -96,10 +99,11 @@ func filterDataLine(sessionId string, params []string) {
 				data[sessionId][fromIndex] = "Reply-To: " + replyTo
 			}
 		}
-		for k := range data[sessionId] {
-			produceOutput("filter-dataline", sessionId, token, data[sessionId][k])
-		}
-		data[sessionId] = nil
+		End:
+			for k := range data[sessionId] {
+				produceOutput("filter-dataline", sessionId, token, data[sessionId][k])
+			}
+			data[sessionId] = nil
 	}
 }
 
