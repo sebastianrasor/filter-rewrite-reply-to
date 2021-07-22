@@ -57,7 +57,6 @@ var data = map[string][]string{}
 
 func filterDataLine(sessionId string, params []string) {
 	token := params[0]
-	//sender := params[1]
 
 	data[sessionId] = append(data[sessionId], params[1])
 
